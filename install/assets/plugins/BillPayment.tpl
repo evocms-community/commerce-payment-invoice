@@ -8,7 +8,7 @@
  * @version     0.1.0
  * @author      mnoskov
  * @internal    @events OnRegisterPayments,OnPageNotFound,OnBeforeOrderSending,OnBeforePaymentProcess
- * @internal    @properties &orgname=Название компании;text; &address=Юридический адрес;text; &inn=ИНН;text; &kpp=КПП;text; &ogrn=ОГРН;text; &contact=Руководитель;text; &account=Номер счета;text; &bank=Банк получателя;text; &bik=БИК;text; &bankaccount=Корреспонденский счет;text;
+ * @internal    @properties &orgname=Название компании;text; &address=Юридический адрес;text; &inn=ИНН;text; &kpp=КПП;text; &ogrn=ОГРН;text; &contact=Руководитель;text; &account=Номер счета;text; &bank=Банк получателя;text; &bik=БИК;text; &bankaccount=Корреспонденский счет;text; &tpl_control=Имя чанка управляющей разметки;text; &tpl_bill=Имя чанка разметки счета;text; &tpl_bill_products_row=Имя чанка строки товара; &tpl_bill_subtotals_row=Имя чанка дополн. услуг;text;
  * @internal    @modx_category Commerce
  */
 
