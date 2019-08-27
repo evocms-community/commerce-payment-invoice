@@ -10,7 +10,7 @@ class BillPayment extends \Commerce\Payments\Payment implements \Commerce\Interf
     public function init()
     {
         return [
-            'code' => 'bill',
+            'code'  => 'bill',
             'title' => 'Bill',
         ];
     }
@@ -29,10 +29,10 @@ class BillPayment extends \Commerce\Payments\Payment implements \Commerce\Interf
         $order = $this->modx->commerce->loadProcessor()->getOrder();
 
         $docid = $this->modx->commerce->getSetting('payment_success_page_id', $this->modx->getConfig('site_start'));
-        $url = $this->modx->makeUrl($docid);
+        $url   = $this->modx->makeUrl($docid);
 
         $out = ci()->tpl->parseChunk($this->getTemplate('control'), [
-            'hash' => $order['hash'],
+            'hash'         => $order['hash'],
             'success_page' => $url,
         ]);
 
@@ -43,43 +43,69 @@ class BillPayment extends \Commerce\Payments\Payment implements \Commerce\Interf
 
     public function printBill($order_hash)
     {
-        $out = '';
-
-        $db = ci()->db;
+        $path = $this->getSetting('path', 'assets/files/bills');
+        $out   = '';
+        $db    = ci()->db;
         $order = $db->getRow($db->select('*', $this->modx->getFullTableName('commerce_orders'), "`hash` = '" . $db->escape($order_hash) . "'"));
 
         if (!empty($order)) {
             ci()->flash->set('last_order_id', $order['id']);
 
-            $processor = $this->modx->commerce->loadProcessor();
-            $order = $processor->loadOrder($order['id']);
-            $cart = $processor->getCart();
-            $total = $cart->getTotal();
+            if (!file_exists(MODX_BASE_PATH . $path)) {
+                $this->createPath($path);
+            }
 
-            $out = ci()->tpl->parseChunk($this->getTemplate('bill'), [
-                'order' => $order,
-                'settings' => $this->settings,
-                'date' => (new \DateTime($order['created_at']))->format('d.m.Y') . ' г.',
-                'total_fmt' => ci()->currency->format($total),
-                'total_ext' => $this->num2str($total),
-                'products' => $this->modx->runSnippet('Cart', [
-                    'instance' => 'order',
-                    'tpl' => $this->getTemplate('bill_products_row'),
-                    'subtotalsRowTpl' => $this->getTemplate('bill_subtotals_row'),
-                    'ownerTPL' => '@CODE:[+dl.wrap+][+subtotals+]',
-                ]),
-            ]);
+            $filename = $order['id'] . '.pdf';
+            $filepath = MODX_BASE_PATH . $path . '/' . $filename;
 
-            $mpdf = new \Mpdf\Mpdf([
-                'tempDir' => MODX_BASE_PATH . 'assets/cache',
-                'default_font' => 'FreeSans',
-            ]);
+            if (!file_exists($filepath)) {
+                $processor = $this->modx->commerce->loadProcessor();
+                $order     = $processor->loadOrder($order['id']);
+                $cart      = $processor->getCart();
+                $total     = $cart->getTotal();
 
-            $mpdf->WriteHTML($out);
-            $out = $mpdf->Output('счет.pdf', 'I');
+                $out = ci()->tpl->parseChunk($this->getTemplate('bill'), [
+                    'order'     => $order,
+                    'settings'  => $this->settings,
+                    'date'      => (new \DateTime($order['created_at']))->format('d.m.Y') . ' г.',
+                    'total_fmt' => ci()->currency->format($total),
+                    'total_ext' => $this->num2str($total),
+                    'products'  => $this->modx->runSnippet('Cart', [
+                        'instance'        => 'order',
+                        'tpl'             => $this->getTemplate('bill_products_row'),
+                        'subtotalsRowTpl' => $this->getTemplate('bill_subtotals_row'),
+                        'ownerTPL'        => '@CODE:[+dl.wrap+][+subtotals+]',
+                    ]),
+                ]);
+
+                $mpdf = new \Mpdf\Mpdf([
+                    'tempDir'      => MODX_BASE_PATH . 'assets/cache',
+                    'default_font' => 'FreeSans',
+                ]);
+
+                $mpdf->WriteHTML($out);
+                $mpdf->Output($filepath, \Mpdf\Output\Destination::FILE);
+            }
+
+            header('Content-type: application/pdf');
+            readfile($filepath);
         }
 
         return $out;
+    }
+
+    private function createPath($path)
+    {
+        $parts = explode('/', trim($path, '/'));
+        $path = MODX_BASE_PATH;
+
+        do {
+            $path .= array_shift($parts) . '/';
+
+            if (!file_exists($path)) {
+                mkdir($path);
+            }
+        } while (!empty($parts));
     }
 
     private function getTemplate($name)
@@ -106,10 +132,10 @@ class BillPayment extends \Commerce\Payments\Payment implements \Commerce\Interf
             array('', 'один', 'два', 'три', 'четыре', 'пять', 'шесть', 'семь', 'восемь', 'девять'),
             array('', 'одна', 'две', 'три', 'четыре', 'пять', 'шесть', 'семь', 'восемь', 'девять'),
         );
-        $a20 = array('десять', 'одиннадцать', 'двенадцать', 'тринадцать', 'четырнадцать', 'пятнадцать', 'шестнадцать', 'семнадцать', 'восемнадцать', 'девятнадцать');
-        $tens = array(2 => 'двадцать', 'тридцать', 'сорок', 'пятьдесят', 'шестьдесят', 'семьдесят', 'восемьдесят', 'девяносто');
+        $a20     = array('десять', 'одиннадцать', 'двенадцать', 'тринадцать', 'четырнадцать', 'пятнадцать', 'шестнадцать', 'семнадцать', 'восемнадцать', 'девятнадцать');
+        $tens    = array(2 => 'двадцать', 'тридцать', 'сорок', 'пятьдесят', 'шестьдесят', 'семьдесят', 'восемьдесят', 'девяносто');
         $hundred = array('', 'сто', 'двести', 'триста', 'четыреста', 'пятьсот', 'шестьсот', 'семьсот', 'восемьсот', 'девятьсот');
-        $unit = array( // Units
+        $unit    = array( // Units
             array('копейка', 'копейки', 'копеек', 1),
             array('рубль', 'рубля', 'рублей', 0),
             array('тысяча', 'тысячи', 'тысяч', 1),
@@ -118,7 +144,7 @@ class BillPayment extends \Commerce\Payments\Payment implements \Commerce\Interf
         );
         //
         list($rub, $kop) = explode('.', sprintf("%015.2f", floatval($num)));
-        $out = array();
+        $out             = array();
         if (intval($rub) > 0) {
             foreach (str_split($rub, 3) as $uk => $v) {
                 // by 3 symbols
@@ -126,8 +152,8 @@ class BillPayment extends \Commerce\Payments\Payment implements \Commerce\Interf
                     continue;
                 }
 
-                $uk = sizeof($unit) - $uk - 1; // unit key
-                $gender = $unit[$uk][3];
+                $uk                 = sizeof($unit) - $uk - 1; // unit key
+                $gender             = $unit[$uk][3];
                 list($i1, $i2, $i3) = array_map('intval', str_split($v, 1));
                 // mega-logic
                 $out[] = $hundred[$i1]; # 1xx-9xx
