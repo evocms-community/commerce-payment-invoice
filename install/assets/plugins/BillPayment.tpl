@@ -41,14 +41,20 @@ switch ($modx->Event->name) {
     }
 
     case 'OnBeforeOrderSending':{
-        $extra = $FL->getPlaceholder('extra', '');
-        $url = $modx->getConfig('site_url') . 'commerce/getbill?hash=' . $params['order']['hash'];
-        $FL->setPlaceholder('extra', $extra . '<p>Скачайте счет для оплаты по ссылке <a href="' . $url . '">' . $url . '</a></p>');
+        if (!empty($order['fields']['payment_method']) && $order['fields']['payment_method'] == 'bill') {
+            $extra = $FL->getPlaceholder('extra', '');
+            $url = $modx->getConfig('site_url') . 'commerce/getbill?hash=' . $params['order']['hash'];
+            $FL->setPlaceholder('extra', $extra . '<p>Скачайте счет для оплаты по ссылке <a href="' . $url . '">' . $url . '</a></p>');
+        }
+
         break;
     }
 
     case 'OnBeforePaymentProcess':{
-        $params['redirect_text'] = 'Ожидайте скачивания счета для оплаты...';
+        if (!empty($order['fields']['payment_method']) && $order['fields']['payment_method'] == 'bill') {
+            $params['redirect_text'] = 'Ожидайте скачивания счета для оплаты...';
+        }
+
         break;
     }
 }
