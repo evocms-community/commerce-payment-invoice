@@ -1,6 +1,6 @@
 <script>
     var url = 'commerce/getbill?hash=[+hash+]';
-debugger;
+
     if (HTMLElement.prototype.click) {
         var link = document.createElement('a');
         link.download = 'bill.pdf';
