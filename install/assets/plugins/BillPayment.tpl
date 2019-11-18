@@ -5,14 +5,14 @@
  * Плагин для выставления счета после оформления заказа
  *
  * @category    plugin
- * @version     0.1.1
+ * @version     0.1.2
  * @author      mnoskov
  * @internal    @events OnRegisterPayments,OnPageNotFound,OnBeforeOrderSending,OnBeforePaymentProcess
  * @internal    @properties &orgname=Название компании;text; &address=Юридический адрес;text; &inn=ИНН;text; &kpp=КПП;text; &ogrn=ОГРН;text; &contact=Руководитель;text; &account=Номер счета;text; &bank=Банк получателя;text; &bik=БИК;text; &bankaccount=Корреспонденский счет;text; &path=Путь к папке для сохранения счетов;text; &tpl_control=Имя чанка управляющей разметки;text; &tpl_bill=Имя чанка разметки счета;text; &tpl_bill_products_row=Имя чанка строки товара; &tpl_bill_subtotals_row=Имя чанка дополн. услуг;text;
  * @internal    @modx_category Commerce
  */
 
-if (empty($modx->commerce)) {
+if (empty($modx->commerce) && !defined('COMMERCE_INITIALIZED')) {
     $modx->logEvent(0, 3, 'Ошибка! Отредактируйте порядок вызова плагинов на событии OnPageNotFound - плагин Commerce должен вызываться ДО плагина Оплата по счету.', 'Ошибка! Оплата по счету');
     return;
 }
@@ -21,7 +21,7 @@ require_once MODX_BASE_PATH . 'assets/plugins/commercebillpayment/src/BillPaymen
 
 $class = new BillPayment($modx, $params);
 
-switch ($modx->Event->name) {
+switch ($modx->event->name) {
     case 'OnRegisterPayments':{
         $modx->commerce->registerPayment('bill', 'Выставить счет', $class);
         break;
