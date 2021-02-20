@@ -4,9 +4,9 @@
 
 ### Установка
 1. Установить плагин через Extras или PackageManager
-2. Установить mpdf через composer
+2. Установить mpdf через composer - выполнить в папке core
 ```
-composer require mpdf/mpdf
+php artisan package:installrequire "mpdf/mpdf" "*"
 ```
 3. Заполнить данные организации в настройках плагина
 4. При необходимости изменить чанк с разметкой счета или создать новый и указать имя в настройках
