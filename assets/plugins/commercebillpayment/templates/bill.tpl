@@ -68,7 +68,7 @@
                 <td style="padding: 5px; width: 20%;">Руководитель</td>
                 <td style="border-bottom: 1px solid #555; padding: 5px; width: 30%;">
                     <div style="width: 1px; height: 1px;">
-                        <img src="/assets/images/sign.png" alt="" style="width: 100px; margin: 0 0 -35px 50px;">
+                        <img src="assets/images/sign.png" alt="" style="width: 100px; margin: 0 0 -35px 50px;">
                     </div>
                 </td>
                 <td style="width: 5%;"></td>
@@ -87,7 +87,7 @@
                 <td style="text-align: right; font-size: 70%;">
                     М.П.
                     <div style="width: 1px; height: 1px;">
-                        <img src="/assets/images/stamp.png" alt="" style="width: 130px; margin: -65px -65px 0 0;">
+                        <img src="assets/images/stamp.png" alt="" style="width: 130px; margin: -65px -65px 0 0;">
                     </div>
                 </td>
                 <td></td>
